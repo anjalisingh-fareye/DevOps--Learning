@@ -1,0 +1,388 @@
+# Day 2 - History of Linux
+
+## Date
+13 August 2026
+
+## Objective
+Understand the history and evolution of Linux.
+
+## Topics Covered
+-
+# History of Linux
+
+Linux is an open-source, Unix-like operating system.
+
+- Linux was created by Linus Torvalds in 1991.
+- It was initially developed as a personal project.
+- Linux is based on the Unix operating system concepts.
+- The Linux kernel is the core part of the operating system.
+- Linux is open-source, so its source code can be viewed and modified.
+- Linux is widely used in servers, cloud platforms, DevOps, networking, and embedded systems.
+- Popular Linux distributions include Ubuntu, Debian, Fedora, RHEL, and CentOS.
+- GNU Project
+- Linus Torvalds
+- Linux Kernel
+- Open Source
+- Linux Distributions
+
+# Linux File System Hierarchy
+
+Linux uses a hierarchical file system that starts from the root directory `/`.
+
+## Important Directories
+
+-`/` – Root directory; the top-level directory.
+-`/bin` – Contains essential user commands.
+-`/boot` – Contains files required for system booting.
+-`/dev` – Contains device files.
+-`/etc` – Contains system configuration files.
+-`/home` – Contains home directories of normal users.
+-`/root` – Home directory of the root user.
+-`/tmp` – Contains temporary files.
+-`/usr` – Contains user programs, libraries, and documentation.
+-`/var` – Contains variable data such as logs.
+-`/opt` – Used for optional/additional software.
+- /mnt` – Temporary mount point for file systems.
+-`/media` – Mount point for removable media.
+-`/proc` – Contains information about running processes and the kernel.
+-`/sys` – Contains information about devices and the kernel.
+
+File Structure
+/
+├── bin
+├── boot
+├── dev
+├── etc
+├── home
+├── root
+├── tmp
+├── usr
+├── var
+├── opt
+├── mnt
+├── media
+├── proc
+└── sys
+
+## Commands Practiced
+3. Creating Files
+touch file1.txt
+touch file2.txt
+touch file1 file2 file3
+
+Create file with content:
+
+echo "Hello Linux" > file.txt
+
+Add more content:
+
+echo "Welcome to Linux" >> file.txt
+4. Creating Directories
+mkdir test
+mkdir dir1 dir2
+mkdir -p parent/child/grandchild
+
+Check:
+
+ls
+ls -l
+5. Reading Files
+cat file.txt
+less file.txt
+more file.txt
+head file.txt
+tail file.txt
+
+Specific lines:
+
+head -n 5 file.txt
+tail -n 5 file.txt
+6. Copy Commands
+cp file.txt backup.txt
+cp file.txt /tmp/
+cp -r dir1 dir2
+cp → file copy
+cp -r → directory copy
+7. Move / Rename
+mv file.txt newfile.txt
+mv newfile.txt /tmp/
+mv dir1 newdir
+
+mv se file move bhi hoti hai aur rename bhi.
+
+8. Delete
+rm file.txt
+rm -i file.txt
+rm -r dir1
+rm -rf dir1
+rmdir emptydir
+rm -rf carefully use karo.
+
+9. Search Commands
+Find
+find .
+find . -type f
+find . -type d
+find . -name "file.txt"
+find . -name "*.txt"
+find /home -type f
+Locate
+locate file.txt
+10. Grep
+grep "Linux" file.txt
+grep -i "linux" file.txt
+grep -n "Linux" file.txt
+grep -r "Linux" .
+-i → case insensitive
+-n → line number
+-r → recursive search
+11. Sort
+sort file.txt
+sort -r file.txt
+sort -n numbers.txt
+12. System Information
+hostname
+hostname -I
+uname
+uname -a
+uname -r
+whoami
+id
+who
+w
+date
+cal
+uptime
+
+Important:
+
+free -h
+df -h
+free -h → RAM
+df -h → disk space
+13. Process Management
+ps
+ps aux
+top
+Search process:
+
+ps aux | grep nginx
+
+Kill process:
+
+kill PID
+kill -9 PID
+14. Environment Variables
+env
+printenv
+echo $PATH
+echo $HOME
+echo $USER
+echo $SHELL
+15. History
+history
+
+Search history:
+
+history | grep ls
+history | grep user
+
+Previous command:
+
+!!
+16. Manual / Help
+man ls
+man mkdir
+man touch
+man cp
+man mv
+man rm
+man find
+man grep
+man useradd
+man groupadd
+
+Quick help:
+
+ls --help
+mkdir --help
+
+
+
+17. File Permissions
+
+Check permissions:
+
+ls -l
+
+Change permission:
+
+chmod 755 file.txt
+chmod 644 file.txt
+chmod +x script.sh
+
+Numeric permissions:
+
+7 = rwx
+6 = rw-
+5 = r-x
+4 = r--
+0 = ---
+18. Ownership
+chown user file.txt
+chown user:group file.txt
+chgrp group file.txt
+
+With sudo:
+
+sudo chown user:group file.txt
+sudo chgrp group file.txt
+19. User Management
+
+Create user:
+
+sudo useradd anjali
+
+Create user with home:
+
+sudo useradd -m anjali
+
+Set password:
+
+sudo passwd anjali
+
+Check user:
+
+id anjali
+
+Current user:
+
+whoami
+
+Modify user:
+
+sudo usermod -s /bin/bash anjali
+
+Add user to group:
+
+sudo usermod -aG developers anjali
+
+Delete user:
+
+sudo userdel anjali
+
+Delete user with home:
+
+sudo userdel -r anjali
+20. Group Management
+
+Create group:
+
+sudo groupadd developers
+
+Check group:
+
+getent group developers
+
+Add user to group:
+
+sudo usermod -aG developers anjali
+
+Check user's groups:
+
+groups anjali
+
+Remove user from group:
+
+sudo gpasswd -d anjali developers
+
+Delete group:
+
+sudo groupdel developers
+21. Important User/Group Files
+cat /etc/passwd
+cat /etc/group
+sudo cat /etc/shadow
+/etc/passwd → user information
+/etc/group → group information
+/etc/shadow → password-related information
+22. Archive Commands
+
+Create .tar:
+
+tar -cvf backup.tar folder/
+
+Extract:
+
+tar -xvf backup.tar
+
+Create .tar.gz:
+
+tar -czvf backup.tar.gz folder/
+
+Extract:
+
+tar -xzvf backup.tar.gz
+23. Networking Basics
+ip addr
+ip route
+hostname -I
+ping google.com
+
+DNS:
+
+nslookup google.com
+24. Package Management — Ubuntu
+sudo apt update
+sudo apt upgrade
+sudo apt install package-name
+sudo apt remove package-name
+⭐ Most Important Commands
+
+
+pwd
+ls
+ls -l
+ls -a
+cd
+mkdir
+touch
+cat
+echo
+cp
+mv
+rm
+rmdir
+find
+grep
+sort
+man
+hostname
+uname
+whoami
+id
+free -h
+df -h
+uptime
+ps
+env
+history
+chmod
+chown
+useradd
+passwd
+usermod
+userdel
+groupadd
+groups
+gpasswd
+groupdel
+
+
+## Learning Outcome
+- Learned the history and evolution of Linux.
+- Understood the role of the Linux kernel.
+- Explored Ubuntu and basic system information commands.
+
+
+
