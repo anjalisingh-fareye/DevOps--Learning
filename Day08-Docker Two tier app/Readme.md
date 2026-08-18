@@ -1,4 +1,4 @@
-Day 09 – Two-Tier Docker Application Deployment on AWS EC2
+#**Day 09 – Two-Tier Docker Application Deployment on AWS EC2**
 
 Date: 18 August 2026
 Track: DevOps
