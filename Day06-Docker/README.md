@@ -1,3 +1,32 @@
+## Objective
+
+The objective of Day 06 was to understand Docker fundamentals, containers,
+Docker architecture, Docker components, Docker images, Docker Engine,
+Docker Client, Docker Registry, and basic Docker commands.
+
+---
+
+# 1. Introduction to Docker
+
+Docker is an open-source containerization platform used to build, package,
+ship, and run applications in lightweight and isolated containers.
+
+Docker packages an application along with its dependencies so that it can
+run consistently across different environments.
+
+### Docker Flow
+
+```text
+Application
+     +
+Dependencies
+     ↓
+Docker Image
+     ↓
+Docker Container
+     ↓
+Running Application
+
 # Day 6 Hands-on Practice
 
 ## Task 1: Pull Nginx Image
