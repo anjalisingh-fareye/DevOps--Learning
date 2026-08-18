@@ -4,6 +4,47 @@ Date: 18 August 2026
 Track: DevOps
 Topic: Building Multi-Tier Project using Docker & Deploying on AWS EC2
 
+#**Two-Tier Docker Application**
+
+A simple two-tier application deployed using Docker and Docker Compose.
+
+Project Overview
+
+This project demonstrates how to containerize an application, build a custom Docker image, run services with Docker Compose, and troubleshoot container networking/DNS issues.
+
+Architecture
+
+                Client / Browser
+                       |
+                       v
+                +--------------+
+                |  App Container|
+                | Node.js       |
+                | Port 3000     |
+                +--------------+
+                       |
+                       v
+                +--------------+
+                | Database      |
+                | Container     |
+                +--------------+
+
+Technologies Used
+
+Docker
+
+Docker Compose
+
+Node.js 22 Alpine
+
+npm
+
+Docker Networking
+
+Linux / Ubuntu
+
+Git & GitHub
+
 Objective
 
 Build and deploy a Two-Tier Application using Docker Compose.
