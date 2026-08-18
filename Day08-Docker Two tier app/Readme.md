@@ -1,324 +1,288 @@
- #Two-Tier Docker Application
+Day 09 – Two-Tier Docker Application Deployment on AWS EC2
 
-A simple two-tier application deployed using Docker and Docker Compose.
+Date: 18 August 2026
+Track: DevOps
+Topic: Building Multi-Tier Project using Docker & Deploying on AWS EC2
 
-Project Overview
+Objective
 
-This project demonstrates how to containerize an application, build a custom Docker image, run services with Docker Compose, and troubleshoot container networking/DNS issues.
+Build and deploy a Two-Tier Application using Docker Compose.
 
-Architecture
+The project contains:
 
-                Client / Browser
-                       |
-                       v
-                +--------------+
-                |  App Container|
-                | Node.js       |
-                | Port 3000     |
-                +--------------+
-                       |
-                       v
-                +--------------+
-                | Database      |
-                | Container     |
-                +--------------+
-
-#Technologies Used
-
-Docker
-
-Docker Compose
-
-Node.js 22 Alpine
-
-npm
-
+Application Tier: Node.js + Express
+Database Tier: MySQL
 Docker Networking
-
-Linux / Ubuntu
-
-Git & GitHub
-
-Project Structure
-
+Docker Volume
+Docker Compose
+AWS EC2 deployment
+Architecture
+                 Internet / Browser
+                        |
+                        | Port 3000
+                        ↓
+                ┌─────────────────┐
+                │   Node.js App   │
+                │   Express       │
+                │   Docker        │
+                └────────┬────────┘
+                         |
+                         | db:3306
+                         ↓
+                ┌─────────────────┐
+                │     MySQL       │
+                │     Docker      │
+                └────────┬────────┘
+                         |
+                         ↓
+                  Docker Volume
+                   mysql-data
+                         
+                AWS EC2 Instance
+1. Project Structure
 two-tier-app/
 ├── app/
 │   ├── Dockerfile
 │   ├── package.json
-│   ├── package-lock.json
-│   └── ...application files
-└── docker-compose.yml
+│   └── server.js
+├── docs/
+│   ├── commands.md
+│   └── troubleshooting.md
+├── docker-compose.yml
+├── .gitignore
+└── README.md
+2. Application Tier
 
-Dockerfile
+Created a Node.js application using:
 
-Example Dockerfile used for the application:
+Express.js
+MySQL2
+
+Application runs on:
+
+Port: 3000
+
+Test endpoint:
+
+/
+
+Response:
+
+Two-Tier Docker Application is Running!
+3. Database Tier
+
+Used:
+
+MySQL 8
+
+Database:
+
+appdb
+
+Application connects to MySQL using the Docker service name:
+
+db:3306
+4. Dockerfile
+
+Created Dockerfile for Node.js application:
 
 FROM node:22-alpine
 
+
 WORKDIR /app
+
 
 COPY package.json .
 
+
 RUN npm install
 
-COPY . .
+
+COPY server.js .
+
 
 EXPOSE 3000
 
+
 CMD ["npm", "start"]
+5. Docker Compose
 
-Dockerfile Instructions
+Docker Compose was used to run both services:
 
-Instruction
+app
+db
 
-Purpose
+The services communicate through the Docker Compose network.
 
-FROM
+Database persistence was implemented using:
 
-Selects the base image
+mysql-data
 
-WORKDIR
+Docker volume.
 
-Sets the working directory inside the container
+6. Docker Network
 
-COPY
+Docker Compose automatically created:
 
-Copies application files into the image
+two-tier-app_default
 
-RUN
+The application accesses MySQL using:
 
-Executes commands while building the image
+db
 
-EXPOSE
+instead of a hard-coded container IP.
 
-Documents the application port
+7. Troubleshooting
 
-CMD
-
-Defines the default command when the container starts
-
-Docker Compose
-
-A basic Compose configuration can look like:
-
-services:
-  app:
-    build:
-      context: ./app
-      network: host
-    ports:
-      - "3000:3000"
-
-network: host is useful as a workaround when Docker's default build network cannot resolve external DNS names. For normal deployments, use the networking mode required by the environment rather than enabling host networking without a reason.
-
-Build the Application Image
-
-From the project root:
-
-cd ~/two-tier-app
-
-Build using the app directory as the Docker build context:
-
-docker build -t two-tier-app ./app
-
-If Docker's default build network has DNS problems:
-
-docker build --network=host -t two-tier-app ./app
-
-Run the Container
-
-docker run -d --name two-tier-app -p 3000:3000 two-tier-app
-
-Check the running container:
-
-docker ps
-
-View logs:
-
-docker logs two-tier-app
-
-Stop the container:
-
-docker stop two-tier-app
-
-Remove the container:
-
-docker rm two-tier-app
-
-Docker Compose Commands
-
-Build the services:
-
-docker compose build
-
-Start the application:
-
-docker compose up -d
-
-Check services:
-
-docker compose ps
-
-View logs:
-
-docker compose logs -f
-
-Stop the application:
-
-docker compose down
-
-Networking Troubleshooting
-
-Problem
-
-During image build, npm returned:
+During the build, encountered:
 
 npm error code EAI_AGAIN
-npm error syscall getaddrinfo
-npm error request to https://registry.npmjs.org/express failed
+Cause
 
-Meaning
+Temporary DNS/network resolution issue while the Docker build was trying to reach:
 
-EAI_AGAIN indicates a temporary DNS/name-resolution failure. In this setup, the host could resolve registry.npmjs.org, while the normal Docker bridge/build network could not.
+registry.npmjs.org
 
-Verify Host DNS
+Tested connectivity using:
 
-ping -c 3 registry.npmjs.org
+curl -I https://registry.npmjs.org
 
-resolvectl status
-
-Test DNS Inside a Container
+and:
 
 docker run --rm node:22-alpine getent hosts registry.npmjs.org
 
-If no address is returned, test through the host network:
+Also tested host networking:
 
-docker run --rm --network=host node:22-alpine getent hosts registry.npmjs.org
+docker run --rm --network host node:22-alpine npm view express version
 
-If the host-network test works, the issue is related to Docker's default/bridge networking or DNS path.
+After resolving the Docker networking issue, the image built successfully.
 
-Build Using Host Networking
+8. MySQL Connection Issue
 
-docker build --network=host -t two-tier-app ./app
+Initially received:
 
-Important Fix: Dockerfile Location
+ECONNREFUSED
+Cause
 
-The Dockerfile is inside the app/ directory, not the project root.
+MySQL container was running, but MySQL itself was still initializing.
 
-Correct:
+Added retry logic in server.js:
 
-docker build -t two-tier-app ./app
+function connectDB() {
+    db.connect((err) => {
+        if (err) {
+            console.log("MySQL not ready, retrying in 5 seconds...");
+            setTimeout(connectDB, 5000);
+            return;
+        }
 
-Incorrect from the project root:
 
-docker build -t two-tier-app .
+        console.log("Connected to MySQL!");
+    });
+}
 
-The second command expects this file:
+After rebuilding:
 
-~/two-tier-app/Dockerfile
+docker compose build --no-cache
+docker compose up -d
 
-which does not exist in this project structure.
+the application successfully connected to MySQL.
 
-Useful Docker Commands
+9. Local Testing
 
-List images:
+Checked containers:
 
-docker images
+docker compose ps
 
-List running containers:
+Result:
 
+two-tier-app-app-1    Up    0.0.0.0:3000->3000/tcp
+two-tier-app-db-1     Up
+
+Application test:
+
+http://localhost:3000
+
+Output:
+
+Two-Tier Docker Application is Running!
+
+Database test:
+
+http://localhost:3000/db
+
+Output:
+
+Database Connected! Time: ...
+10. AWS EC2 Deployment
+
+The next phase is deploying the same application on an AWS EC2 Ubuntu instance.
+
+Deployment flow
+GitHub
+   |
+   ↓
+AWS EC2
+   |
+   ↓
+Docker
+   |
+   ↓
+Docker Compose
+   |
+   ├── Node.js Container
+   |
+   └── MySQL Container
+EC2 tasks
+Create Ubuntu EC2 instance
+Configure Security Group
+Connect through SSH
+Install Docker
+Install Docker Compose
+Clone GitHub repository
+Build Docker images
+Start containers
+Test application using EC2 public IP
+11. EC2 Security Group
+
+Required ports:
+
+Port	Purpose
+22	SSH
+3000	Node.js application
+
+MySQL port 3306 should not be exposed publicly.
+
+MySQL remains accessible only inside the Docker network.
+
+12. Important Docker Commands
+docker compose build
+docker compose build --no-cache
+docker compose up -d
+docker compose down
+docker compose ps
+docker compose logs
+docker compose logs -f
 docker ps
-
-List all containers:
-
-docker ps -a
-
-Inspect an image:
-
-docker inspect two-tier-app
-
-Enter a running container:
-
-docker exec -it two-tier-app sh
-
-View Docker networks:
-
+docker images
 docker network ls
+docker volume ls
+13. Learning Outcomes
 
-Inspect the bridge network:
+By the end of Day 09, I practiced:
 
-docker network inspect bridge
-
-Learning Outcomes
-
-Understood Docker images and containers.
-
-Created a custom Dockerfile.
-
-Built a Node.js image from node:22-alpine.
-
-Used Docker Compose to manage application services.
-
-Learned how Docker build context works.
-
-Practiced port mapping and container management.
-
-Troubleshot DNS/network connectivity during npm install.
-
-Understood the difference between Docker bridge networking and host networking.
-
-Common Errors
-
-Dockerfile not found
-
-lstat .../two-tier-app/Dockerfile: no such file or directory
-
-Fix:
-
-docker build -t two-tier-app ./app
-
-npm EAI_AGAIN
-
-getaddrinfo EAI_AGAIN registry.npmjs.org
-
-First test:
-
-docker run --rm --network=host node:22-alpine getent hosts registry.npmjs.org
-
-If this works, investigate Docker bridge/build DNS configuration or use host networking as an environment-approved workaround.
-
-Buildx warning
-
-You may see:
-
-Docker Compose is configured to build using Bake, but buildx isn't installed
-
-This is a warning about the build tooling and is separate from the npm EAI_AGAIN DNS error.
-
-Git Commands
-
-Initialize repository if needed:
-
-git init
-
-Check status:
-
-git status
-
-Add files:
-
-git add .
-
-Commit:
-
-git commit -m "Add two-tier Docker application"
-
-Add remote repository:
-
-git remote add origin <YOUR_GITHUB_REPOSITORY_URL>
-
-Push:
-
-git branch -M main
-git push -u origin main
+Building a two-tier application
+Creating a Dockerfile
+Building custom Docker images
+Running multiple containers
+Docker Compose
+Docker networking
+Container-to-container communication
+Docker volumes
+MySQL persistence
+Node.js + MySQL integration
+Troubleshooting Docker DNS
+Troubleshooting database startup issues
+Preparing application for AWS EC2 deployment
+GitHub-based deployment workflow 
 
