@@ -1,6 +1,6 @@
 # Day 07 - Docker Advanced Concepts
 
-**Date:** 17-18 August 2026  
+**Date:** 17 August 2026  
 **Track:** DevOps
 
 ## Objective
